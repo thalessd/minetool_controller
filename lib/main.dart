@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:minetoolcontroller/screens/home.dart';
+import 'package:minetoolcontroller/services/socket.dart';
 
 void main() => runApp(Main());
 
 class Main extends StatelessWidget {
-  // This widget is the root of your application.
+  Socket _socket;
+
+  Main() {
+    this._socket = Socket('http://devdes.io:4444');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +20,7 @@ class Main extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Home(),
+      home: Home(socket: this._socket),
     );
   }
 }
