@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
 class InfoWithText extends StatelessWidget {
-  String _title;
-  String _info;
+  final String title;
+  final String info;
 
-  InfoWithText({String title = "INFO", String info = "0.0"}) {
-    this._title = title;
-    this._info = info;
-  }
+  InfoWithText({this.title = "INFO", this.info = "0.0"});
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +12,13 @@ class InfoWithText extends StatelessWidget {
       children: <Widget>[
         Container(
           child: Text(
-            this._title,
+            title,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           margin: EdgeInsets.only(right: 7),
         ),
         Text(
-          this._info,
+          info,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
         ),
       ],

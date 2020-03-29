@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:minetoolcontroller/services/socket.dart';
-import 'package:minetoolcontroller/widgets/server_action_status.dart';
+import 'package:minetoolcontroller/widgets/server_action_state.dart';
 import 'package:minetoolcontroller/widgets/top_info.dart';
 import 'package:minetoolcontroller/widgets/user_list_tile.dart';
 
@@ -16,6 +18,10 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+
+  String _serverState = "load";
+  bool _serverOnline = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,13 +30,38 @@ class _Home extends State<Home> {
 
     socket.onConnect((_) {
       print("Conectou ao Socket");
+      socket.emitServerStatus();
     });
 
-    socket.onUserLogged((data) {
-      print(data);
+    socket.onServerRunning((_) {
+        setState(() {
+          _serverState = "load";
+        });
+    });
+
+    socket.onServerDone((_) {
+      socket.emitServerStatus();
+    });
+
+    socket.onServerStop((_) {
+      socket.emitServerStatus();
+    });
+
+    socket.onServerStatusData((data) {
+      setState(() {
+        _serverState = data["serverOnline"] ? "play" : "stop";
+        _serverOnline = data["serverOnline"];
+      });
     });
 
     socket.connect();
+  }
+
+  void serverRestart() {
+    widget.socket.emitServerRestart();
+    setState(() {
+      _serverState = "load";
+    });
   }
 
   @override
@@ -42,9 +73,14 @@ class _Home extends State<Home> {
         children: <Widget>[
           Expanded(
             flex: 2,
-            child: TopInfo(),
+            child: TopInfo(isOnline: _serverOnline),
           ),
-          Expanded(flex: 4, child: ServerActionStatus()),
+          Expanded(flex: 4, child: ServerActionState(
+            state: _serverState,
+            playPress: () { widget.socket.emitServerRun(); },
+            stopPress: () { widget.socket.emitServerStop(); },
+            restartPress: () { serverRestart(); },
+          )),
           Expanded(
               flex: 4,
               child: ListView(

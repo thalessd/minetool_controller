@@ -19,7 +19,47 @@ class Socket {
     _socket.on("connect", evt);
   }
 
+  void onServerRunning(evt) {
+    _socket.on("server_running", evt);
+  }
+
+  void onServerDone(evt) {
+    _socket.on("server_is_done", evt);
+  }
+
+  void onServerStop(evt) {
+    _socket.on("server_stopped", evt);
+  }
+
+  void onServerError(evt) {
+    _socket.on("server_errored", evt);
+  }
+
+  void onServerStatusData(evt) {
+    _socket.on("server_status_data", evt);
+  }
+
   void onUserLogged(evt) {
     _socket.on("user_logged", evt);
+  }
+
+  void onUserLoggedOut(evt) {
+    _socket.on("user_logged_out", evt);
+  }
+
+  void emitServerStatus() {
+    _socket.emit("server_status");
+  }
+
+  void emitServerRun() {
+    _socket.emit("server_run");
+  }
+
+  void emitServerStop() {
+    _socket.emit("server_stop");
+  }
+
+  void emitServerRestart() {
+    _socket.emit("server_restart");
   }
 }
