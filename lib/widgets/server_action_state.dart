@@ -12,7 +12,7 @@ class ServerActionState extends StatelessWidget {
   Function restartPress;
 
   ServerActionState({
-    String state = "play",
+    String status = "online",
     String cpuUsage = "0",
     String memUsage = "0",
     this.playPress,
@@ -22,11 +22,11 @@ class ServerActionState extends StatelessWidget {
     cpuUsageData = "---";
     memUsageData = "---";
 
-    switch (state) {
-      case "load":
+    switch (status) {
+      case "loading":
         area = loadArea();
         break;
-      case "play":
+      case "online":
         cpuUsageData = cpuUsage;
         memUsageData = memUsage;
 
@@ -35,7 +35,7 @@ class ServerActionState extends StatelessWidget {
             mainBtnColor: Colors.red,
             mainBtnPress: stopPress);
         break;
-      case "stop":
+      case "offline":
         area = buttonArea(
             mainBtnIcon: Icons.play_arrow,
             mainBtnColor: Colors.green,

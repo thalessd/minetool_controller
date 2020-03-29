@@ -2,12 +2,37 @@ import 'package:flutter/material.dart';
 
 class TopInfo extends StatelessWidget {
   final String serverName;
-  final bool isOnline;
+  final String serverDifficulty;
+  final String status;
 
-  TopInfo({this.serverName = "Server Name", this.isOnline = true});
+  TopInfo(
+      {this.serverName = "Server Name",
+      this.status = "loading",
+      this.serverDifficulty});
 
   @override
   Widget build(BuildContext context) {
+    String text;
+    Color color;
+
+    switch (this.status) {
+      case "online":
+        text = "Online";
+        color = Colors.green.shade700;
+        break;
+      case "offline":
+        text = "Offline";
+        color = Colors.red.shade700;
+        break;
+      case "loading":
+        text = "Carregando";
+        color = Colors.blue.shade700;
+        break;
+      default:
+        text = "";
+        color = Colors.black45;
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -31,10 +56,10 @@ class TopInfo extends StatelessWidget {
                 margin: EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isOnline ? Colors.green.shade700 : Colors.red.shade700,
+                  color: color,
                 ),
               ),
-              Text(isOnline ? "Online" : "Offline",
+              Text("$text | ${serverDifficulty.toUpperCase()}",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold))
             ],
           )

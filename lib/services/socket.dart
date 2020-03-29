@@ -35,6 +35,10 @@ class Socket {
     _socket.on("server_errored", evt);
   }
 
+  void onServerStatsInfo(evt) {
+    _socket.on("server_stats", evt);
+  }
+
   void onServerStatusData(evt) {
     _socket.on("server_status_data", evt);
   }

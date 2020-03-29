@@ -18,9 +18,12 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+  String _serverStatus = "loading";
+  String _serverName = "Carregando...";
+  String _serverDifficulty = "---";
 
-  String _serverState = "load";
-  bool _serverOnline = false;
+  String _cpuUsage = "0%";
+  String _memoryUsage = "0 Kb";
 
   @override
   void initState() {
@@ -34,9 +37,7 @@ class _Home extends State<Home> {
     });
 
     socket.onServerRunning((_) {
-        setState(() {
-          _serverState = "load";
-        });
+      socket.emitServerStatus();
     });
 
     socket.onServerDone((_) {
@@ -47,21 +48,22 @@ class _Home extends State<Home> {
       socket.emitServerStatus();
     });
 
+    socket.onServerStatsInfo((data) {
+      setState(() {
+        _cpuUsage = data["cpu"];
+        _memoryUsage = data["memory"];
+      });
+    });
+
     socket.onServerStatusData((data) {
       setState(() {
-        _serverState = data["serverOnline"] ? "play" : "stop";
-        _serverOnline = data["serverOnline"];
+        _serverStatus = data["serverStatus"];
+        _serverName = data["serverName"];
+        _serverDifficulty = data["serverDifficulty"];
       });
     });
 
     socket.connect();
-  }
-
-  void serverRestart() {
-    widget.socket.emitServerRestart();
-    setState(() {
-      _serverState = "load";
-    });
   }
 
   @override
@@ -73,14 +75,28 @@ class _Home extends State<Home> {
         children: <Widget>[
           Expanded(
             flex: 2,
-            child: TopInfo(isOnline: _serverOnline),
+            child: TopInfo(
+              status: _serverStatus,
+              serverName: _serverName,
+              serverDifficulty: _serverDifficulty,
+            ),
           ),
-          Expanded(flex: 4, child: ServerActionState(
-            state: _serverState,
-            playPress: () { widget.socket.emitServerRun(); },
-            stopPress: () { widget.socket.emitServerStop(); },
-            restartPress: () { serverRestart(); },
-          )),
+          Expanded(
+              flex: 4,
+              child: ServerActionState(
+                status: _serverStatus,
+                cpuUsage: _cpuUsage,
+                memUsage: _memoryUsage,
+                playPress: () {
+                  widget.socket.emitServerRun();
+                },
+                stopPress: () {
+                  widget.socket.emitServerStop();
+                },
+                restartPress: () {
+                  widget.socket.emitServerRestart();
+                },
+              )),
           Expanded(
               flex: 4,
               child: ListView(
