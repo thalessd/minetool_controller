@@ -5,7 +5,27 @@ enum UserMenu { kick, say, tp }
 class Users extends StatelessWidget {
   final List<Map<String, dynamic>> userOnlineList;
 
-  Users({this.userOnlineList});
+  final Function onSayMessageToUser;
+  final Function onKickUser;
+  final Function onTpUser;
+
+  Users(
+      {this.userOnlineList, this.onSayMessageToUser, this.onKickUser, this.onTpUser});
+
+  void _onSelectItem(UserMenu result, int onlineUserIndex) {
+    Map<String, dynamic> userSelected = userOnlineList[onlineUserIndex];
+
+    switch (result) {
+      case UserMenu.say:
+        return onSayMessageToUser(userSelected);
+      case UserMenu.kick:
+        return onKickUser(userSelected);
+      case UserMenu.tp:
+        return onTpUser(userSelected);
+      default:
+        return;
+    }
+  }
 
   _popupMenuItem({UserMenu value, String title, IconData iconData}) {
     return PopupMenuItem<UserMenu>(
@@ -25,10 +45,15 @@ class Users extends StatelessWidget {
   List<PopupMenuEntry<UserMenu>> _buildPopupMenuItem(BuildContext context) {
     return [
       _popupMenuItem(
-          value: UserMenu.say, iconData: Icons.comment, title: "Enviar Mensagem"),
+          value: UserMenu.say,
+          iconData: Icons.comment,
+          title: "Enviar Mensagem"),
       _popupMenuItem(
-          value: UserMenu.tp, iconData: Icons.swap_horizontal_circle, title: "Teleportar"),
-      _popupMenuItem(value: UserMenu.kick, iconData: Icons.block, title: "Kickar")
+          value: UserMenu.tp,
+          iconData: Icons.swap_horizontal_circle,
+          title: "Teleportar"),
+      _popupMenuItem(
+          value: UserMenu.kick, iconData: Icons.block, title: "Kickar")
     ];
   }
 
@@ -39,6 +64,9 @@ class Users extends StatelessWidget {
 
     return PopupMenuButton<UserMenu>(
         itemBuilder: _buildPopupMenuItem,
+        onSelected: (UserMenu result) {
+          _onSelectItem(result, index);
+        },
         tooltip: "IP: $ip",
         child: ListTile(
           leading: Icon(

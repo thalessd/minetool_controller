@@ -121,7 +121,14 @@ class _Home extends State<Home> {
                   widget.socket.emitServerRestart();
                 },
               )),
-          Expanded(flex: 4, child: Users(userOnlineList: _userOnlineList)),
+          Expanded(
+              flex: 4,
+              child: Users(
+                userOnlineList: _userOnlineList,
+                onSayMessageToUser: (user) { print(user); },
+                onTpUser: (user) { print(user); },
+                onKickUser: (user) { print(user); },
+              )),
           SizedBox(
             width: double.infinity,
             child: Container(
