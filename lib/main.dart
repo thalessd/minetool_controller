@@ -14,7 +14,7 @@ class Main extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'MineTool Controller',
       darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

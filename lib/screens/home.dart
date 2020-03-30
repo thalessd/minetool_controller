@@ -1,12 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:minetoolcontroller/services/socket.dart';
 import 'package:minetoolcontroller/widgets/server_action_state.dart';
 import 'package:minetoolcontroller/widgets/top_info.dart';
-import 'package:minetoolcontroller/widgets/user_list_tile.dart';
+import 'package:minetoolcontroller/widgets/users.dart';
 
 class Home extends StatefulWidget {
   final Socket socket;
@@ -24,6 +23,8 @@ class _Home extends State<Home> {
 
   String _cpuUsage = "0%";
   String _memoryUsage = "0 Kb";
+
+  List<Map<String, dynamic>> _userOnlineList = [];
 
   @override
   void initState() {
@@ -56,10 +57,25 @@ class _Home extends State<Home> {
     });
 
     socket.onServerStatusData((data) {
+      var dateFormatter = DateFormat("dd 'às' HH'h' mm");
+
+      List<Map<String, dynamic>> userOnlineList = [];
+
+      for (var playerData in data["playersOnline"]) {
+        var date = DateTime.fromMillisecondsSinceEpoch(playerData["date"]);
+
+        userOnlineList.add({
+          "user": playerData["user"],
+          "logInTime": dateFormatter.format(date),
+          "ip": playerData["ip"]
+        });
+      }
+
       setState(() {
         _serverStatus = data["serverStatus"];
         _serverName = data["serverName"];
         _serverDifficulty = data["serverDifficulty"];
+        _userOnlineList = userOnlineList;
       });
     });
 
@@ -97,17 +113,7 @@ class _Home extends State<Home> {
                   widget.socket.emitServerRestart();
                 },
               )),
-          Expanded(
-              flex: 4,
-              child: ListView(
-                children: <Widget>[
-                  UserListTile(),
-                  UserListTile(),
-                  UserListTile(),
-                  UserListTile(),
-                  UserListTile(),
-                ],
-              )),
+          Expanded(flex: 4, child: Users(userOnlineList: _userOnlineList)),
           SizedBox(
             width: double.infinity,
             child: Container(
