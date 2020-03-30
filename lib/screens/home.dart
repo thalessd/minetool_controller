@@ -49,6 +49,14 @@ class _Home extends State<Home> {
       socket.emitServerStatus();
     });
 
+    socket.onUserLogged((_) {
+      socket.emitServerStatus();
+    });
+
+    socket.onUserLoggedOut((_) {
+      socket.emitServerStatus();
+    });
+
     socket.onServerStatsInfo((data) {
       setState(() {
         _cpuUsage = data["cpu"];
