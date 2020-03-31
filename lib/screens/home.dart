@@ -26,9 +26,94 @@ class _Home extends State<Home> {
 
   List<Map<String, dynamic>> _userOnlineList = [];
 
+  TextEditingController _kickUserController;
+  TextEditingController _sayToUserController;
+
+  List<Widget> _dialogActions(
+      {BuildContext context, Function onConfirm, String confirmText}) {
+    return <Widget>[
+      FlatButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text("CANCELAR", style: TextStyle(color: Colors.redAccent)),
+      ),
+      FlatButton(
+        onPressed: () {
+          onConfirm();
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          confirmText.toUpperCase(),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
+      ),
+    ];
+  }
+
+  void _kickUserDialog(Map<String, dynamic> user) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Deseja kickar ${user["user"]}?"),
+            content: TextField(
+              controller: _kickUserController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Motivo',
+              ),
+            ),
+            actions: _dialogActions(
+                context: context,
+                confirmText: "Kickar",
+                onConfirm: () {
+                  widget.socket.emitUserKick(
+                    user["user"],
+                    reason: _kickUserController.value.text
+                  );
+
+                  _kickUserController.text = "";
+                }),
+          );
+        });
+  }
+
+  void _sayToUserDialog(Map<String, dynamic> user) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Enviar mensagem para ${user["user"]}?"),
+            content: TextField(
+              controller: _sayToUserController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Mensagem',
+              ),
+            ),
+            actions: _dialogActions(
+                context: context,
+                confirmText: "Enviar",
+                onConfirm: () {
+                  widget.socket.emitUserSay(
+                      _sayToUserController.value.text,
+                      user: user["user"]
+                  );
+                  _sayToUserController.text = "";
+                }),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _kickUserController = TextEditingController();
+    _sayToUserController = TextEditingController();
 
     var socket = widget.socket;
 
@@ -93,55 +178,58 @@ class _Home extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
-      padding: EdgeInsets.all(8),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: TopInfo(
-              status: _serverStatus,
-              serverName: _serverName,
-              serverDifficulty: _serverDifficulty,
-            ),
-          ),
-          Expanded(
-              flex: 4,
-              child: ServerActionState(
-                status: _serverStatus,
-                cpuUsage: _cpuUsage,
-                memUsage: _memoryUsage,
-                playPress: () {
-                  widget.socket.emitServerRun();
-                },
-                stopPress: () {
-                  widget.socket.emitServerStop();
-                },
-                restartPress: () {
-                  widget.socket.emitServerRestart();
-                },
-              )),
-          Expanded(
-              flex: 4,
-              child: Users(
-                userOnlineList: _userOnlineList,
-                onSayMessageToUser: (user) { print(user); },
-                onTpUser: (user) { print(user); },
-                onKickUser: (user) { print(user); },
-              )),
-          SizedBox(
-            width: double.infinity,
-            child: Container(
-              margin: EdgeInsets.only(top: 2),
-              child: RaisedButton(
-                onPressed: () {},
-                color: Theme.of(context).primaryColor,
-                child: Text("LOGS GLOBAIS"),
+          padding: EdgeInsets.all(8),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: TopInfo(
+                  status: _serverStatus,
+                  serverName: _serverName,
+                  serverDifficulty: _serverDifficulty,
+                ),
               ),
-            ),
-          )
-        ],
-      ),
-    ));
+              Expanded(
+                  flex: 4,
+                  child: ServerActionState(
+                    status: _serverStatus,
+                    cpuUsage: _cpuUsage,
+                    memUsage: _memoryUsage,
+                    playPress: () {
+                      widget.socket.emitServerRun();
+                    },
+                    stopPress: () {
+                      widget.socket.emitServerStop();
+                    },
+                    restartPress: () {
+                      widget.socket.emitServerRestart();
+                    },
+                  )),
+              Expanded(
+                  flex: 4,
+                  child: Users(
+                    userOnlineList: _userOnlineList,
+                    onSayMessageToUser: _sayToUserDialog,
+                    onTpUser: (user) {
+                      print(user);
+                    },
+                    onKickUser: _kickUserDialog,
+                  )),
+              SizedBox(
+                width: double.infinity,
+                child: Container(
+                  margin: EdgeInsets.only(top: 2),
+                  child: RaisedButton(
+                    onPressed: () {},
+                    color: Theme.of(context).primaryColor,
+                    child: Text("LOGS GLOBAIS"),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }

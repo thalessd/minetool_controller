@@ -66,4 +66,12 @@ class Socket {
   void emitServerRestart() {
     _socket.emit("server_restart");
   }
+
+  void emitUserKick(String user, {String reason = ""}) {
+    _socket.emit("kick", [user, reason]);
+  }
+
+  void emitUserSay(String message, { String user = "" }) {
+    _socket.emit("say", [message, user]);
+  }
 }
