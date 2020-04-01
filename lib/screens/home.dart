@@ -27,7 +27,7 @@ class _Home extends State<Home> {
   List<Map<String, dynamic>> _userOnlineList = [];
 
   TextEditingController _kickUserController;
-  TextEditingController _sayToUserController;
+  TextEditingController _msgToUserController;
 
   List<Widget> _dialogActions(
       {BuildContext context, Function onConfirm, String confirmText}) {
@@ -79,14 +79,14 @@ class _Home extends State<Home> {
         });
   }
 
-  void _sayToUserDialog(Map<String, dynamic> user) {
+  void _msgToUserDialog(Map<String, dynamic> user) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Enviar mensagem para ${user["user"]}?"),
             content: TextField(
-              controller: _sayToUserController,
+              controller: _msgToUserController,
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: InputDecoration(
@@ -98,11 +98,11 @@ class _Home extends State<Home> {
                 context: context,
                 confirmText: "Enviar",
                 onConfirm: () {
-                  widget.socket.emitUserSay(
-                      _sayToUserController.value.text,
+                  widget.socket.emitUserMsg(
+                      _msgToUserController.value.text,
                       user: user["user"]
                   );
-                  _sayToUserController.text = "";
+                  _msgToUserController.text = "";
                 }),
           );
         });
@@ -113,7 +113,7 @@ class _Home extends State<Home> {
     super.initState();
 
     _kickUserController = TextEditingController();
-    _sayToUserController = TextEditingController();
+    _msgToUserController = TextEditingController();
 
     var socket = widget.socket;
 
@@ -211,7 +211,7 @@ class _Home extends State<Home> {
                   flex: 4,
                   child: Users(
                     userOnlineList: _userOnlineList,
-                    onSayMessageToUser: _sayToUserDialog,
+                    onMessageToUser: _msgToUserDialog,
                     onTpUser: (user) {
                       print(user);
                     },

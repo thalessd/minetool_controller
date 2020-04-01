@@ -71,7 +71,7 @@ class Socket {
     _socket.emit("kick", [user, reason]);
   }
 
-  void emitUserSay(String message, { String user = "" }) {
-    _socket.emit("say", [message, user]);
+  void emitUserMsg(String message, { String user = "" }) {
+    _socket.emit("msg", [message, user]);
   }
 }

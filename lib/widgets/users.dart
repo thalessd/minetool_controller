@@ -5,19 +5,19 @@ enum UserMenu { kick, say, tp }
 class Users extends StatelessWidget {
   final List<Map<String, dynamic>> userOnlineList;
 
-  final Function onSayMessageToUser;
+  final Function onMessageToUser;
   final Function onKickUser;
   final Function onTpUser;
 
   Users(
-      {this.userOnlineList, this.onSayMessageToUser, this.onKickUser, this.onTpUser});
+      {this.userOnlineList, this.onMessageToUser, this.onKickUser, this.onTpUser});
 
   void _onSelectItem(UserMenu result, int onlineUserIndex) {
     Map<String, dynamic> userSelected = userOnlineList[onlineUserIndex];
 
     switch (result) {
       case UserMenu.say:
-        return onSayMessageToUser(userSelected);
+        return onMessageToUser(userSelected);
       case UserMenu.kick:
         return onKickUser(userSelected);
       case UserMenu.tp:
